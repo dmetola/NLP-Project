@@ -1,5 +1,6 @@
 import spacy
-import json
+import json, jsonmerge
+from jsonmerge import merge
 import collections
 from collections import Counter
 
@@ -10,6 +11,7 @@ text = open(file_name).read()
 doc = nlp(text)
 
 def word_frequency():
+    """Returns 100 most frequent words, and unique word cases"""
     words = [token.text for token in doc if not token.is_stop if not token.tag_ in ["CD", "_SP"] and not token.is_punct]
     word_freq = Counter(words)
     common_words = word_freq.most_common(100)
@@ -20,15 +22,16 @@ def word_frequency():
 
 def ents_pos():
     """Recognises NER from text file and outputs it into JSON"""
-    ents_file = open("Beowulf-ents-pos.json", "w")
+    ents_file = open("Beowulf-ents.json", "w")
     ents = [{"TOKEN":ent.text, "LABEL":ent.label_, "DEF":spacy.explain(ent.label_)} for ent in doc.ents]
+    json.dump(ents, ents_file, indent=6)
+    pos_file = open("Beowulf-pos.json", "w")
     pos = [{"POS":token.pos_, "TAG":token.tag_, "STOPWORD":token.is_stop} for token in doc]
+    json.dump(pos, pos_file, indent=6)
     #Section to merge both dictionaries into one
-    ents_pos = {}
-    for k in set(k for d in ents_pos for k in d):
-        ents_pos[k] = [d[k] for d in dicts if k in d]
-    json.dump(ents_pos, ents_file, indent=6)
-    # print(ents)
+    ents_pos = merge(ents, pos)
+    ents_pos_file = open("Beowulf_ents_pos.json", "w")
+    json.dump(ents_pos, ents_pos_file, indent=6)
     
-word_frequency()
+# word_frequency()
 ents_pos()
