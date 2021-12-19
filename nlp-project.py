@@ -18,6 +18,8 @@ def word_frequency():
         file.write(str(common_words))
         file.write("\n" + str(unique_words))
 
+#Esto es una prueba
+
 def ents_pos():
     """Recognises NER from text file and outputs it into JSON"""
     ents_file = open("Beowulf-ents-pos.json", "w")
